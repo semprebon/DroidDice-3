@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Droid Dice 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="edit_dice_spec_message">Enter Dice</string>
+    <string name="button_update">Update</string>
+</resources>

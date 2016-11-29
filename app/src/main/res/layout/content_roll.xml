@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="org.semprebon.droiddice3.RollActivity"
+    tools:showIn="@layout/activity_roll">
+
+    <EditText android:id="@+id/dice_spec_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_dice_spec_message"/>
+
+    <Button android:id="@+id/button"
+        android:layout_below="@+id/dice_spec_edit"
+        android:layout_alignParentRight="true"
+
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_update"
+        android:onClick="updateDice" />
+
+    <FrameLayout android:id="@+id/chart_frame"
+        android:layout_below="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <TextView android:id="@+id/result_text"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="36pt"
+        android:text="12"/>
+</RelativeLayout>
