@@ -37,8 +37,7 @@ class SerializerTest : TestSupport {
     }
 
     @Test
-    fun deserializeSumHighest() {
-        assertEquals(DiceCombination(listOf(d6, d6, d6, d6), SumHighestAggregator(3)),
+    fun deserializeSumHighest() { assertEquals(DiceCombination(listOf(d6, d6, d6, d6), SumHighestAggregator(3)),
                 serializer.deserialize("4d6[k3]"))
     }
 

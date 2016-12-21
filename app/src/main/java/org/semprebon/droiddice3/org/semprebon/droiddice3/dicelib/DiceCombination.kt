@@ -54,6 +54,8 @@ class DiceCombination(val initialRandomizers: List<Randomizer>,
                        map({ roll -> probabilityOfRolling(roll)}))
     }
 
+    fun valuesByRoll() = range.associate { Pair(it, probToRoll(it).value) }
+
     override fun equals(other: Any?): Boolean {
         if (other !is DiceCombination) return false
         if (other.javaClass != javaClass) return false

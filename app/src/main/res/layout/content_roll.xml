@@ -30,7 +30,12 @@
     <FrameLayout android:id="@+id/chart_frame"
         android:layout_below="@+id/button"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+        <org.semprebon.droiddice3.ChartView
+            android:id="@+id/chart_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </FrameLayout>
 
     <TextView android:id="@+id/result_text"
         android:layout_centerVertical="true"
@@ -39,4 +44,12 @@
         android:layout_height="wrap_content"
         android:textSize="36pt"
         android:text="12"/>
+    <TextView android:id="@+id/probability_text"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18pt"
+        android:text="12"/>
+
 </RelativeLayout>
