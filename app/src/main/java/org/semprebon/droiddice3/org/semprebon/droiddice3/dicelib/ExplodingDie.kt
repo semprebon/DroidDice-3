@@ -1,5 +1,6 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
+import android.util.Log
 import org.apache.commons.lang3.builder.HashCodeBuilder
 
 /**

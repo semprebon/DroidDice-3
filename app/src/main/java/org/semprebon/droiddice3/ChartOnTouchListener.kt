@@ -9,51 +9,42 @@ import android.view.View
 import android.widget.TextView
 
 /**
- * Created by Andrew on 12/18/2016.
+ * Implements top to select/unselect, scrool to select multiple bars
  */
 class ChartOnTouchListener(val context: RollActivity, val chartView: ChartView) :
         GestureDetector.SimpleOnGestureListener() {
     private val TAG = "ChartOnTouchListener"
+    private var inScroll = false
+    private var selectedTo = false
 
     override fun onDown(event: MotionEvent): Boolean {
-        Log.v(TAG, "Tap down on ${event?.x},${event?.y}")
+        inScroll = false
         return true
     }
 
-    override fun onDoubleTap(event: MotionEvent?): Boolean {
-        val x = event?.x
-        val y = event?.y
-        Log.v(TAG, "Double Tap up on ${x},${y}")
-        if (x != null && y != null) {
-            val roll: Int = chartView.xToIndex(x)
-            val bar = chartView.getBar(roll)
-            if (bar != null) {
-                val selected = bar.selected
-                val nextSelected = chartView.getBar(roll+1)?.selected ?: false
-                val prevSelected = chartView.getBar(roll-1)?.selected ?: false
-                val range =
-                        if (nextSelected == prevSelected) {
-                            roll..roll
-                        } else if (nextSelected) {
-                            chartView.minIndex..roll
-                        } else {
-                            roll..chartView.maxIndex
-                        }
-                range.forEach { r ->
-                    val newBar = chartView.getBar(r)?.copy(selected = !selected)
-                    if (newBar != null) {
-                        chartView.setBar(r, newBar)
-                    }
-                }
-                chartView.invalidate()
-                context.updateProbability()
-                return true
+    override fun onScroll(event1: MotionEvent?, event2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+        val bar1 = barFromEvent(event1)
+        val bar2 = barFromEvent(event2)
+        if (bar1 != null && bar2 != null) {
+            if (!inScroll) {
+                selectedTo = !bar1.selected
+                inScroll = true
             }
+            (bar1.index..bar2.index).forEach { index ->
+                val bar = chartView.getBar(index)
+                if (bar != null && bar.selected != selectedTo) {
+                    val newBar = bar.copy(selected = selectedTo)
+                    chartView.setBar(newBar.index, newBar)
+                }
+            }
+            chartView.invalidate()
+            context.updateProbability()
+            return true
         }
-        return super.onDoubleTap(event)
+        return super.onScroll(event1, event2, distanceX, distanceY)
     }
 
-     override fun onSingleTapUp(event: MotionEvent?): Boolean {
+    override fun onSingleTapUp(event: MotionEvent?): Boolean {
         val x = event?.x
         val y = event?.y
         if (x != null && y != null) {
@@ -69,4 +60,15 @@ class ChartOnTouchListener(val context: RollActivity, val chartView: ChartView) 
         }
         return super.onSingleTapUp(event)
     }
+
+    private fun barFromEvent(event: MotionEvent?) : ChartView.Bar? {
+        val x = event?.x
+        if (x != null) {
+            val roll: Int = chartView.xToIndex(x)
+            return chartView.getBar(roll)
+        } else {
+            return null
+        }
+    }
+
 }

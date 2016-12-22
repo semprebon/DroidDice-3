@@ -12,7 +12,7 @@ import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.Probability
 import java.util.*
 
 /**
- * Created by Andrew on 12/17/2016.
+ * Displays bar chart of probabilities.
  */
 class ChartView(context: Context, attributes: AttributeSet) : View(context, attributes) {
     private val TAG = "ChartView"
@@ -49,8 +49,12 @@ class ChartView(context: Context, attributes: AttributeSet) : View(context, attr
 
 
     override fun onDraw(canvas: Canvas) {
-        if (bars == null || bars.count() == 0) return
-        canvas.drawColor(Color.LTGRAY)
+        if (bars.count() == 0) return
+        val blackPaint = paintForColor(Color.BLACK)
+        val barWidth = indexToX(minIndex+1) - indexToX(minIndex)
+        blackPaint.textSize = barWidth*0.75f
+        blackPaint.textAlign = Paint.Align.CENTER
+
         val paints =
                 arrayOf(barColor, selectedBarColor, rolledBarColor, selectedRolledBarColor).
                         map { paintForColor(it) }
@@ -60,6 +64,7 @@ class ChartView(context: Context, attributes: AttributeSet) : View(context, attr
             val y0 = valueToY(0.0)
             val y1 = valueToY((bar.value))
             canvas.drawRect(x0, y0, x1, y1, paints[colorIndexForBar(bar)])
+            canvas.drawText(bar.index.toString(), (x0 + x1) / 2, y0 - 5, blackPaint)
         }
     }
 
@@ -75,6 +80,6 @@ class ChartView(context: Context, attributes: AttributeSet) : View(context, attr
     private fun indexToX(index: Int) = ((index - minIndex) * width).toFloat() / (maxIndex + 1 - minIndex)
     private fun valueToY(value: Double) = height - ((value * height) / maxValue).toFloat()
 
-    public fun xToIndex(x: Float) = ((x*(maxIndex + 1 - minIndex)) / width - 0.5).toInt() + minIndex
-    public fun yToValue(y: Float) = ((height - y) * maxValue / height).toDouble()
+    fun xToIndex(x: Float) = ((x*(maxIndex + 1 - minIndex)) / width - 0.5).toInt() + minIndex
+    fun yToValue(y: Float) = ((height - y) * maxValue / height)
 }

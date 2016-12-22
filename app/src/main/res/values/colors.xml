@@ -4,5 +4,11 @@
     <color name="colorPrimaryLight">#FFECB3</color>
     <color name="colorPrimaryDark">#FFA000</color>
     <color name="colorAccent">#FF5252</color>
+
+    <color name="barColor">#ffecb3</color>
+    <color name="selectedBarColor">#ffc1b3</color>
+    <color name="rolledBarColor">#ff5252</color>
+    <color name="selectedRolledBarColor">#d32f2f</color>
+
     <color name="colorWild">#0000FF</color>
 </resources>

@@ -1,5 +1,6 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
+import android.util.Log
 import org.apache.commons.lang3.builder.CompareToBuilder
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
@@ -7,7 +8,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder
 /**
  * Models a simple n-sided die
  */
-open class SimpleDie(sides: Int) : Randomizer {
+open class SimpleDie(val sides: Int) : Randomizer {
     override val min = 1
     override val max = sides
     open val size = (max - min) + 1
@@ -16,7 +17,10 @@ open class SimpleDie(sides: Int) : Randomizer {
 
     var value = min
 
-    override fun roll() = RollResult(listOf(Randomizer.random.nextInt(max - min + 1) + min), this)
+    override fun roll(): RollResult {
+        val value = Randomizer.random.nextInt(sides) + 1
+        return RollResult(listOf(value), this)
+    }
 
     override fun probToRoll(target: Int): Probability {
         return if (target in range) baseProbability else Probability.NEVER

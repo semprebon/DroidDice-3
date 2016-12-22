@@ -38,22 +38,18 @@ import android.text.method.Touch.onTouchEvent
 
 
 /**
- * TODO: Select range on graph to display probabilty
  * TODO: Save dice
+ * TODO: zoom and pan
  * TODO: Handle rolls with many possibilities gracefully: 3d6!
  * TODO: Keyboard/buttons for entering dice
  * TODO: Color scheme!
- * TODO: Rolling wrong values (79, 102, etc) for 2d6!
- * TODO: Label bars?
  */
 class RollActivity : AppCompatActivity() {
 
     var dice: DiceCombination = DiceCombination(listOf(SimpleDie(6)))
     var detector: GestureDetectorCompat? = null
 
-    companion object {
-        private val TAG = "RollActivity"
-    }
+    companion object { private val TAG = "RollActivity" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,7 +123,7 @@ class RollActivity : AppCompatActivity() {
         val resultText = findViewById(R.id.probability_text) as TextView
         val chartView = findViewById(R.id.chart_view) as ChartView
         val probability =
-                chartView.getBars().filter { it.selected }.map { it.value }.reduce { a,b -> a+b }
-        resultText.setText(probability.toString())
+                chartView.getBars().filter { it.selected }.map { it.value }.fold(0.0, { a,b -> a+b })
+        resultText.setText("${String.format("%.2f", probability*100.0)}%")
     }
 }
