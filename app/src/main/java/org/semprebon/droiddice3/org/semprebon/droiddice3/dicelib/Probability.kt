@@ -5,7 +5,7 @@ import java.text.DecimalFormat
 /**
  * Basic probability math
  */
-class Probability(val value: Double) {
+class Probability(val value: Double) : Comparable<Probability> {
 
     fun not(): Probability = Probability(1.0 - value)
     infix fun and(p: Probability): Probability = Probability(value * p.value)
@@ -17,6 +17,10 @@ class Probability(val value: Double) {
 
     override fun toString(): String {
         return STRING_FORMAT.format(value)
+    }
+
+    override fun compareTo(other: Probability): Int {
+        return this.value.compareTo(other.value)
     }
 
     companion object {

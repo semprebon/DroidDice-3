@@ -12,10 +12,17 @@ open class SimpleDie(val sides: Int) : Randomizer {
     override val min = 1
     override val max = sides
     open val size = (max - min) + 1
-    override val range = min..max
     val baseProbability = Probability(1.0/sides)
 
     var value = min
+
+    override fun range(minProbability: Double): IntRange {
+        if (baseProbability.value > minProbability) {
+            return min..max
+        } else {
+            return min..min
+        }
+    }
 
     override fun roll(): RollResult {
         val value = Randomizer.random.nextInt(sides) + 1
@@ -23,7 +30,7 @@ open class SimpleDie(val sides: Int) : Randomizer {
     }
 
     override fun probToRoll(target: Int): Probability {
-        return if (target in range) baseProbability else Probability.NEVER
+        return if (target in min..max) baseProbability else Probability.NEVER
     }
 
     override fun probToBeat(target: Int): Probability {

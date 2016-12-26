@@ -4,36 +4,73 @@ import org.apache.commons.lang3.builder.CompareToBuilder
 import org.apache.commons.lang3.builder.EqualsBuilder
 
 /**
- * Created by Andrew on 11/25/2016.
+ * Implements a randomizer consisting of a number of different dice, which can be aggregated by
+ * an aggregator object to determine the final value
  */
-class DiceCombination(val initialRandomizers: List<Randomizer>,
+class DiceCombination(initialRandomizers: List<Randomizer>,
                       val aggregator: Aggregator = SumAggregator()) : Randomizer {
+
+    companion object {
+        val LIKELY_PROBABILITY = Probability(1.0 / 1000.0)
+    }
 
     val randomizers = initialRandomizers.sorted()
     override val min = aggregator.min(randomizers)
     override val max = aggregator.max(randomizers)
+
+    override fun mostLikelyValue() = aggregate(randomizers.map { it.mostLikelyValue() })
+
+    /**
+     * Returnsa a range that excludes less than minProbability of possible rolls
+     */
+    override fun range(minProbability: Double): IntRange {
+        val values = possibleValues(endCondition = totalProbabilityOf(1.0 - minProbability))
+        val min = values.min() ?: 0
+        val max = values.max() ?: 0
+        return min..max
+    }
+
+    /**
+     * Returns an end condition that ensures that included rolls have a total probability greater
+     * than limit
+     */
+    fun totalProbabilityOf(limit: Double): (List<Int>) -> Boolean {
+        var total = 0.0
+        return { values -> total += probabilityOfRolling(values).value; total > limit }
+    }
+
+    /**
+     * Returns a filter excluding anything less likely than minProbability
+     */
+    fun moreProbableThan(minimum: Double): (List<Int>) -> Boolean {
+        return { values -> probabilityOfRolling(values).value >= minimum }
+    }
 
     override fun roll(): RollResult {
         val values = randomizers.flatMap { it.roll().values }
         return RollResult(values, this)
     }
 
-    fun permutations(ranges: List<IntRange>) : List<List<Int>> {
-        val last = ranges.last()
-        if (ranges.size == 1) return last.map({listOf(it)})
-
-        val rest = ranges.dropLast(1)
-        return permutations(rest).flatMap({ vs -> last.map({ v -> vs.plus(v) }) })
+    fun defaultRange(): IntRange {
+        return 1..10
     }
 
-    val possibleRolls = permutations(randomizers.map { it.range })
-    val possibleValues = possibleRolls.map { aggregator.aggregate(it) }.distinct()
+    fun possibleRolls(range: IntRange = defaultRange(),
+                      filter: (List<Int>) -> Boolean = { true },
+                      endCondition: (List<Int>) -> Boolean = { false }): Iterable<List<Int>> {
+        val ranges = aggregator.limitRanges(range, randomizers.map { it.range() })
+        return Permutator(ranges, filter = filter, endCondition = endCondition,
+                startAt = randomizers.map { it.mostLikelyValue() })
+    }
 
-    override val range =
-            possibleValues.reduce({ a,b -> if (a < b) a else b })..
-            possibleValues.reduce({ a,b -> if (a > b) a else b })
+    fun possibleValues(range: IntRange = defaultRange(),
+                       filter: (List<Int>) -> Boolean = { true },
+                       endCondition: (List<Int>) -> Boolean = { false }): Iterable<Int> {
+        return possibleRolls(range, filter = filter, endCondition = endCondition).
+                map { aggregate(it) }.distinct()
+    }
 
-    override fun aggregate(values: List<Int>): Int = aggregator.aggregate(values)
+    fun aggregate(values: List<Int>): Int = aggregator.aggregate(values)
 
     fun probabilityOfRolling(values: List<Int>): Probability {
         val probs = values.zip(randomizers).map({ pair -> pair.second.probToRoll(pair.first) })
@@ -42,19 +79,19 @@ class DiceCombination(val initialRandomizers: List<Randomizer>,
 
     override fun probToRoll(target: Int): Probability {
         return Probability.sum(
-                possibleRolls.
-                        filter({ roll -> (aggregator.aggregate(roll) == target) }).
-                        map({ roll -> probabilityOfRolling(roll)}))
+                possibleRolls(defaultRange(), { aggregate(it) == target }).map { probabilityOfRolling(it) })
     }
 
     override fun probToBeat(target: Int): Probability {
         return Probability.sum(
-               possibleRolls.
-                       filter({ roll -> (aggregator.aggregate(roll) >= target) }).
-                       map({ roll -> probabilityOfRolling(roll)}))
+               possibleRolls(defaultRange(), { aggregate(it) >= target }).map { probabilityOfRolling(it) })
     }
 
-    fun valuesByRoll() = range.associate { Pair(it, probToRoll(it).value) }
+    fun probabilitiesByValue(range: IntRange,
+                             filter: (List<Int>) -> Boolean = { true },
+                             endCondition: (List<Int>) -> Boolean = { false }) =
+            possibleValues(range, filter = filter, endCondition = endCondition).
+                    associate { Pair(it, probToRoll(it).value) }
 
     override fun equals(other: Any?): Boolean {
         if (other !is DiceCombination) return false
@@ -71,4 +108,5 @@ class DiceCombination(val initialRandomizers: List<Randomizer>,
         }
         return builder.toComparison()
     }
+
 }

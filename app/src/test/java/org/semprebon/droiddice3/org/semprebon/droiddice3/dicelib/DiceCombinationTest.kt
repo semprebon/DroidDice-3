@@ -22,7 +22,7 @@ class DiceCombinationTest : TestSupport {
 
     @Test
     fun possibleRollsForSingleDie() {
-        assertSameElements((1..6).map({listOf(it)}), singleDie.possibleRolls)
+        assertSameElements((1..6).map({listOf(it)}), singleDie.possibleRolls())
     }
 
     @Test
@@ -48,12 +48,12 @@ class DiceCombinationTest : TestSupport {
 
     @Test
     fun rangeWithSimpleDie() {
-        assertEquals(1..6, singleDie.range)
+        assertEquals(1..6, singleDie.range())
     }
 
     @Test
     fun rangeWithSeveralDice() {
-        assertEquals(2..12, dice.range)
+        assertEquals(2..12, dice.range())
     }
 
     @Test
@@ -98,5 +98,39 @@ class DiceCombinationTest : TestSupport {
                 DiceCombination(listOf(d6, d6))) != 0)
         assertTrue(DiceCombination(listOf(d6, d8)).compareTo(
                 DiceCombination(listOf(d6, d6), SumHighestAggregator(1))) != 0)
+    }
+
+    @Test
+    fun performanceOfprobabilitiesByValue() {
+        var values: Map<Int, Double>? = null
+        val dice = DiceCombination(listOf(dx6, dx6, dx6, dx6), SumAggregator())
+        val range = dice.range()
+
+        values = verifyMemoryUse(20*1024, {
+            val dice = DiceCombination(listOf(dx6, dx6, dx6, dx6), SumAggregator())
+            dice.probabilitiesByValue(dice.range(0.01),
+                    endCondition = dice.totalProbabilityOf(0.99))
+            }) as Map<Int, Double>
+        System.out.println("Permutations: ${values.count()}")
+
+        values = verifySpeed(0.1, {
+            val dice = DiceCombination(listOf(dx6, dx6, dx6, dx6), SumAggregator())
+            dice.probabilitiesByValue(dice.range(0.01),
+                    endCondition = dice.totalProbabilityOf(0.99))
+            }) as Map<Int, Double>
+        System.out.println(values[4])
+    }
+
+    @Test
+    fun performanceOfLikelyRange() {
+        var values: IntRange? = null
+        values = verifyMemoryUse(1024, {
+            val dice = DiceCombination(listOf(dx6, dx6, dx6, dx6), SumAggregator())
+            dice.range()
+        }) as IntRange
+        values = verifySpeed(0.1, {
+            val dice = DiceCombination(listOf(dx6, dx6, dx6, dx6), SumAggregator())
+            dice.range()
+        }) as IntRange
     }
 }

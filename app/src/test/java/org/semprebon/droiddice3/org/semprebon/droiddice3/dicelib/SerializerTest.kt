@@ -76,4 +76,10 @@ class SerializerTest : TestSupport {
         assertEquals("4d6[k3]",
                 serializer.serialize(DiceCombination(listOf(d6, d6, d6, d6), SumHighestAggregator(3))))
     }
+
+    @Test
+    fun serializeSumHighestWithDifferentDice() {
+        assertEquals("d8!+d6[k1]",
+                serializer.serialize(DiceCombination(listOf(d6, dx8), SumHighestAggregator(1))))
+    }
 }

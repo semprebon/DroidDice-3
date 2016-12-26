@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="org.semprebon.droiddice3.RollActivity">
+    tools:context="org.semprebon.droiddice3.RollActivity"
+    tools:keep="@layout/activity_roll">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

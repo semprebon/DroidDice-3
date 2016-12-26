@@ -40,4 +40,19 @@ class SumAggregatorTest {
     fun aggregateWithEmptyList() {
         assertEquals(0, aggr.aggregate(listOf()))
     }
+
+    @Test
+    fun limitSingleRangeToReasonableSize() {
+        assertEquals(listOf(2..12), aggr.limitRanges(2..12, listOf(1..100)))
+    }
+
+    @Test
+    fun limitMultipleRangeToReasonableSize() {
+        assertEquals(listOf(1..10,2..3), aggr.limitRanges(2..12, listOf(1..100, 2..3)))
+    }
+
+    @Test
+    fun limitRangesReasonablyWhenNoPossbleLimit() {
+        assertNotNull(aggr.limitRanges(2..12, listOf(13..15)))
+    }
 }

@@ -38,7 +38,12 @@ class ExplodingDieTest {
 
     @Test
     fun range() {
-        assertEquals(1..100, die.range)
+        assertEquals(1..19, die.range(0.01))
+    }
+
+    @Test
+    fun mostLikelyValueIsAverageRoundedUp() {
+        assertEquals(5, die.mostLikelyValue())
     }
 
     @Test

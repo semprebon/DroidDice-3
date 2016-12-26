@@ -29,7 +29,7 @@ class SimpleDieTest {
     }
 
     @Test
-    fun range() { assertEquals(d8.range, 1..8) }
+    fun range() { assertEquals(d8.range(), 1..8) }
 
     @Test
     fun roll() {
@@ -37,6 +37,11 @@ class SimpleDieTest {
             val r = d6.roll().value
             assertTrue("${r} is between 1 and 6", r in 1..6)
         }
+    }
+
+    @Test
+    fun mostLikelyValueIsAverage() {
+        assertEquals(3, d6.mostLikelyValue())
     }
 
     @Test

@@ -40,4 +40,14 @@ class SumHighestAggregatorTest {
     fun aggregateWithEmptyList() {
         Assert.assertEquals(0, aggr.aggregate(listOf()))
     }
+
+    @Test
+    fun limitRangeToReasonableSize() {
+        Assert.assertEquals(listOf(1..4, 2..3, 1..4),
+                aggr.limitRanges(2..6, listOf(1..100, 2..3, 1..10)))
+    }
+    @Test
+    fun limitRangesReasonablyWhenNoPossbleLimit() {
+        Assert.assertNotNull(aggr.limitRanges(13..100, listOf(1..4,1..4,1..4)))
+    }
 }

@@ -31,6 +31,7 @@ class ChartView(context: Context, attributes: AttributeSet) : View(context, attr
     val BAR_GAP = 3
 
     fun getBars() = bars
+
     fun setBars(bars: List<Bar>) {
         this.bars = bars
         maxValue = bars.fold(0.0) { max, bar -> if (bar.value > max) bar.value else max }

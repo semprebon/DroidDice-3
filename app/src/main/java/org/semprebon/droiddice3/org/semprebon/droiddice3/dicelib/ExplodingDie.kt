@@ -8,11 +8,22 @@ import org.apache.commons.lang3.builder.HashCodeBuilder
  * again and added
  */
 class ExplodingDie(sides: Int) : SimpleDie(sides) {
-    val max_rolls = 10
+    val max_rolls = 3
     override val size = sides
     override val min = 1
     override val max = max_rolls * sides
-    override val range = 1..(size * max_rolls)
+
+    override fun mostLikelyValue() = (1+sides) / 2
+
+    override fun range(minProbability: Double): IntRange {
+        var p = baseProbability.value
+        var rangeMax = sides-1
+        while (p * baseProbability.value > minProbability) {
+            p = p * baseProbability.value
+            rangeMax += sides
+        }
+        return min..rangeMax
+    }
 
     override fun roll(): RollResult {
         var value = super.roll().value

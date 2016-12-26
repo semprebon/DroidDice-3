@@ -11,19 +11,20 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="org.semprebon.droiddice3.RollActivity"
-    tools:showIn="@layout/activity_roll">
+    tools:showIn="@layout/activity_roll"
+    tools:keep="@layout/content_roll">
 
-    <EditText android:id="@+id/dice_spec_edit"
+    <Spinner
+        android:id="@+id/dice_spec"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="@string/edit_dice_spec_message"/>
+        android:layout_height="wrap_content" />
 
     <Button android:id="@+id/button"
         android:layout_alignParentEnd="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_update"
-        android:onClick="updateDice" />
+        android:onClick="roll" />
 
     <TextView android:id="@+id/result_text"
         android:layout_below="@+id/button"

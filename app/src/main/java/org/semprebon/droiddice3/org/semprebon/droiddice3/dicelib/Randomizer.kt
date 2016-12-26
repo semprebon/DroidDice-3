@@ -9,20 +9,20 @@ import java.util.Random;
 interface Randomizer : Comparable<Randomizer> {
     val min: Int
     val max: Int
-    val range: IntRange
 
     companion object {
         val random = Random()
+        val MIN_PROBABILITY = 0.0000001 // 1 in a million
     }
 
+    fun range(minProbability: Double = MIN_PROBABILITY): IntRange
+
     fun roll(): RollResult
-    fun aggregate(values: List<Int>): Int =
-            if (values.size == 1) values.first()
-            else throw IllegalArgumentException("Expected 1 value, got ${values.joinToString(",")}")
     fun probToRoll(target: Int): Probability
     fun probToBeat(target: Int): Probability
     fun probToRollOver(target: Int) = probToBeat(target+1)
     fun probToRollUnder(target: Int) = probToBeat(target).not()
+    fun mostLikelyValue(): Int = (max + min) / 2
 
     fun compareToBuilder(other: Randomizer): CompareToBuilder {
         return CompareToBuilder().

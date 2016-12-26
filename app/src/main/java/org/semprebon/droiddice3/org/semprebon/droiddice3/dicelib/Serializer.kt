@@ -24,13 +24,13 @@ class Serializer {
         val aggregator =
             if (matcher != null) {
                 val keepStr = matcher.groupValues.component2()
-                SumHighestAggregator(keepStr.toInt() ?: 1)
+                SumHighestAggregator(keepStr.toInt())
             } else {
                 SumAggregator()
             }
         val diceStr = if (matcher != null) s.substring(0, matcher.range.first) else s
         val randomizers = diceStr.split("+").flatMap({ deserializeTerm(it)})
-        return DiceCombination(randomizers)
+        return DiceCombination(randomizers, aggregator)
     }
 
     fun serialize(dice: DiceCombination): String {
@@ -79,5 +79,5 @@ class Serializer {
         throw ParseException("Unrecognized element: ${s}")
     }
 
-    public class ParseException(s: String) : Exception(s) {}
+    class ParseException(s: String) : Exception(s) {}
 }

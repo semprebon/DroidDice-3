@@ -7,4 +7,6 @@ interface Aggregator {
     fun min(randomizers: List<Randomizer>): Int
     fun max(randomizers: List<Randomizer>): Int
     fun aggregate(values: List<Int>): Int
+    fun limitRanges(limit: IntRange, ranges: List<IntRange>): List<IntRange>
+
 }
