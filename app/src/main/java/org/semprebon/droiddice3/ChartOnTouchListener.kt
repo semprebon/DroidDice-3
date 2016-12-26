@@ -13,7 +13,16 @@ import android.widget.TextView
  */
 class ChartOnTouchListener(val context: RollActivity, val chartView: ChartView) :
         GestureDetector.SimpleOnGestureListener() {
-    private val TAG = "ChartOnTouchListener"
+
+    companion object {
+        private val TAG = "ChartOnTouchListener"
+
+        private val JUST_THIS: (Int, Int) -> Boolean = { selectedIndex, index -> index == selectedIndex }
+        private val ALL_ABOVE: (Int, Int) -> Boolean = { selectedIndex, index -> index >= selectedIndex }
+        private val ALL_BELOW: (Int, Int) -> Boolean = { selectedIndex, index -> index <= selectedIndex }
+        private val NONE_SELECTED: (Int, Int) -> Boolean = { selectedIndex, index -> false }
+    }
+
     private var inScroll = false
     private var selectedTo = false
 
@@ -23,17 +32,28 @@ class ChartOnTouchListener(val context: RollActivity, val chartView: ChartView) 
     }
 
     override fun onSingleTapUp(event: MotionEvent?): Boolean {
-        val x = event?.x
-        val y = event?.y
-        if (x != null && y != null) {
-            val value: Int = chartView.xToIndex(x)
-            val bar = chartView.getBar(value)
-            if (bar != null) {
-                val newBar = bar.copy(selected = !bar.selected)
-                chartView.setBar(newBar.index, newBar)
-                chartView.invalidate()
-                context.updateProbability()
+        val selectedBar = barFromEvent(event)
+        if (selectedBar != null) {
+            val lowerSelected = chartView.getBar(selectedBar.index - 1)?.selected
+            val higherSelected = chartView.getBar(selectedBar.index + 1)?.selected
+            val lowerCond = lowerSelected ?: higherSelected ?: false
+            val higherCond = higherSelected ?: lowerSelected ?: false
+            val selection =
+                    if (!selectedBar.selected) JUST_THIS
+                    else if (lowerSelected != true && higherSelected == false) ALL_ABOVE
+                    else if (higherSelected != false && lowerSelected == false) ALL_BELOW
+                    else NONE_SELECTED
+
+            (chartView.minIndex..chartView.maxIndex).forEach {
+                val bar = chartView.getBar(it)
+                val desiredSelected = selection(selectedBar.index, it)
+                if (bar != null && desiredSelected != bar.selected) {
+                    val newBar = bar.copy(selected = desiredSelected)
+                    chartView.setBar(newBar.index, newBar)
+                }
             }
+            chartView.invalidate()
+            context.updateProbability()
             return true
         }
         return super.onSingleTapUp(event)

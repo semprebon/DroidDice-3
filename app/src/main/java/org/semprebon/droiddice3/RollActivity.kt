@@ -15,7 +15,6 @@ import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.RollResult
 
 
 /**
- * TODO: Selection should just be single bar, >- sleected bar, <= selected bar
  * TODO: Save dice
  * TODO: zoom and pan
  * TODO: Keyboard/buttons for entering dice
