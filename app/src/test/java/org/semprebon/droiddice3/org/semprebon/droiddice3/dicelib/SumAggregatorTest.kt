@@ -4,7 +4,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 /**
- * Created by Andrew on 11/25/2016.
+ * Test for SumAggregator
  */
 class SumAggregatorTest {
 
@@ -52,7 +52,7 @@ class SumAggregatorTest {
     }
 
     @Test
-    fun limitRangesReasonablyWhenNoPossbleLimit() {
+    fun limitRangesReasonablyWhenNoPossibleLimit() {
         assertNotNull(aggr.limitRanges(2..12, listOf(13..15)))
     }
 }

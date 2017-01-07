@@ -23,16 +23,16 @@ class AsNeededList<T>(val iterator: Iterator<T>) : List<T> {
     }
 
     override fun contains(element: T): Boolean {
-        return indexOf(element) == -1
+        throw UnsupportedOperationException()
     }
 
     override fun containsAll(elements: Collection<T>): Boolean {
-        return elements.all { contains(it) }
+        throw UnsupportedOperationException()
     }
 
     override fun get(index: Int): T {
         loadTo(index)
-        return store.get(index)
+        return store[index]
     }
 
     override fun indexOf(element: T): Int {
@@ -53,18 +53,15 @@ class AsNeededList<T>(val iterator: Iterator<T>) : List<T> {
     }
 
     override fun iterator(): Iterator<T> {
-        loadAll()
-        return store.iterator()
+        throw UnsupportedOperationException()
     }
 
     override fun lastIndexOf(element: T): Int {
-        loadAll()
-        return store.lastIndexOf(element)
+        throw UnsupportedOperationException()
     }
 
     override fun listIterator(index: Int): ListIterator<T> {
-        loadAll()
-        return store.listIterator(index)
+        throw UnsupportedOperationException()
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): List<T> {
@@ -74,12 +71,6 @@ class AsNeededList<T>(val iterator: Iterator<T>) : List<T> {
 
     private fun loadTo(index: Int) {
         while(iterator.hasNext() && store.count() <= index) {
-            loadNext()
-        }
-    }
-
-    private fun loadAll() {
-        while(iterator.hasNext()) {
             loadNext()
         }
     }

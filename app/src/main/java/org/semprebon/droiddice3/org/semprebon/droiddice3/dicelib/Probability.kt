@@ -28,8 +28,8 @@ class Probability(val value: Double) : Comparable<Probability> {
         val NEVER = Probability(0.0)
         val ALWAYS = Probability(1.0)
 
-        fun and(ps: List<Probability>): Probability = ps.fold(ALWAYS, { p, q -> p.and(q) })
-        fun or(ps: List<Probability>): Probability = and(ps.map({ p -> p.not() })).not()
-        fun sum(ps: List<Probability>): Probability = ps.fold(NEVER, { p, q -> p.sum(q) })
+        fun and(ps: List<Probability>): Probability = ps.fold(ALWAYS, Probability::and)
+        fun or(ps: List<Probability>): Probability = and(ps.map(Probability::not)).not()
+        fun sum(ps: List<Probability>): Probability = ps.fold(NEVER, Probability::sum)
     }
 }

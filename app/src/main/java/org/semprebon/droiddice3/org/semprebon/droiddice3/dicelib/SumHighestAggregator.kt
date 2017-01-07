@@ -1,7 +1,7 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
 /**
- * Created by Andrew on 11/25/2016.
+ * SumHighestAggregator adds up the highest n dice
  */
 class SumHighestAggregator(val n: Int) : Aggregator {
     override fun min(randomizers: List<Randomizer>): Int {

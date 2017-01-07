@@ -17,8 +17,6 @@ package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
  */
 class Serializer {
 
-    private data class ResultStrings(val diceStr: String, val aggregatorStr: String)
-
     fun deserialize(s: String): DiceCombination {
         val matcher = Regex("\\[k(\\d+)\\]?\\Z").find(s)
         val aggregator =
@@ -38,7 +36,7 @@ class Serializer {
                 groupBy { serializeComponent(it) }.
                 map({
                     val prefix = if (it.value.size == 1) "" else it.value.size.toString()
-                    "${prefix}${it.key}"
+                    "$prefix${it.key}"
                 }).joinToString("+")
         val suffix = when (dice.aggregator) {
                 is SumAggregator -> ""
@@ -63,12 +61,12 @@ class Serializer {
             val multiplier = if (multiplierString.isBlank()) 1 else multiplierString.toInt()
             return (1..multiplier).map({ deserializeRandomizer(randomizer) })
         } else {
-            throw ParseException("Invalid term ${s}")
+            throw ParseException("Invalid term $s")
         }
     }
 
     private fun deserializeRandomizer(s: String): Randomizer {
-        val matcher1 = Regex("d(\\d+)\\!").matchEntire(s)
+        val matcher1 = Regex("d(\\d+)!").matchEntire(s)
         if (matcher1 != null) {
             return ExplodingDie(matcher1.groupValues.component2().toInt())
         }
@@ -76,8 +74,8 @@ class Serializer {
         val matcher2 = Regex("d(\\d+)").matchEntire(s)
         if (matcher2 != null) return SimpleDie(matcher2.groupValues.component2().toInt())
 
-        throw ParseException("Unrecognized element: ${s}")
+        throw ParseException("Unrecognized element: $s")
     }
 
-    class ParseException(s: String) : Exception(s) {}
+    class ParseException(s: String) : Exception(s)
 }

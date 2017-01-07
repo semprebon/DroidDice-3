@@ -1,7 +1,7 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
-import org.apache.commons.lang3.builder.CompareToBuilder
 import org.apache.commons.lang3.builder.EqualsBuilder
+import org.apache.commons.lang3.builder.HashCodeBuilder
 
 /**
  * Implements a randomizer consisting of a number of different dice, which can be aggregated by
@@ -17,11 +17,10 @@ class DiceCombination(initialRandomizers: List<Randomizer>,
     val randomizers = initialRandomizers.sorted()
     override val min = aggregator.min(randomizers)
     override val max = aggregator.max(randomizers)
-
-    override fun mostLikelyValue() = aggregate(randomizers.map { it.mostLikelyValue() })
+    override val expectedValue by lazy { aggregator.expectedValue(randomizers) }
 
     /**
-     * Returnsa a range that excludes less than minProbability of possible rolls
+     * Returns a a range that excludes less than minProbability of possible rolls
      */
     override fun range(minProbability: Double): IntRange {
         val values = possibleValues(endCondition = totalProbabilityOf(1.0 - minProbability))
@@ -39,28 +38,22 @@ class DiceCombination(initialRandomizers: List<Randomizer>,
         return { values -> total += probabilityOfRolling(values).value; total > limit }
     }
 
-    /**
-     * Returns a filter excluding anything less likely than minProbability
-     */
-    fun moreProbableThan(minimum: Double): (List<Int>) -> Boolean {
-        return { values -> probabilityOfRolling(values).value >= minimum }
-    }
-
     override fun roll(): RollResult {
         val values = randomizers.flatMap { it.roll().values }
         return RollResult(values, this)
     }
 
     fun defaultRange(): IntRange {
-        return 1..10
+        return min..max
     }
 
     fun possibleRolls(range: IntRange = defaultRange(),
                       filter: (List<Int>) -> Boolean = { true },
                       endCondition: (List<Int>) -> Boolean = { false }): Iterable<List<Int>> {
         val ranges = aggregator.limitRanges(range, randomizers.map { it.range() })
-        return Permutator(ranges, filter = filter, endCondition = endCondition,
-                startAt = randomizers.map { it.mostLikelyValue() })
+        val permutations = Permutator(ranges, filter = filter, endCondition = endCondition,
+                startAt = randomizers.mapIndexed { i, r -> keepIn(ranges[i], r.expectedValue.toInt()) })
+        return permutations.filter { values: List<Int>  -> range.contains(aggregate(values)) }
     }
 
     fun possibleValues(range: IntRange = defaultRange(),
@@ -79,17 +72,17 @@ class DiceCombination(initialRandomizers: List<Randomizer>,
 
     override fun probToRoll(target: Int): Probability {
         return Probability.sum(
-                possibleRolls(defaultRange(), { aggregate(it) == target }).map { probabilityOfRolling(it) })
+                possibleRolls(target..target).map { probabilityOfRolling(it) })
     }
 
     override fun probToBeat(target: Int): Probability {
         return Probability.sum(
-               possibleRolls(defaultRange(), { aggregate(it) >= target }).map { probabilityOfRolling(it) })
+               possibleRolls(target..max).map { probabilityOfRolling(it) })
     }
 
-    fun probabilitiesByValue(range: IntRange,
+    fun probabilitiesByValue(range: IntRange = min..max,
                              filter: (List<Int>) -> Boolean = { true },
-                             endCondition: (List<Int>) -> Boolean = { false }) =
+                             endCondition: (List<Int>) -> Boolean = { false }): Map<Int, Double> =
             possibleValues(range, filter = filter, endCondition = endCondition).
                     associate { Pair(it, probToRoll(it).value) }
 
@@ -101,12 +94,19 @@ class DiceCombination(initialRandomizers: List<Randomizer>,
                isEquals()
     }
 
+    override fun hashCode(): Int {
+        return HashCodeBuilder(13, 17).append(randomizers).toHashCode()
+    }
+
     override fun compareTo(other: Randomizer): Int {
-        var builder = compareToBuilder(other)
+        val builder = compareToBuilder(other)
         if (other is DiceCombination) {
             builder.append(randomizers.toTypedArray(), other.randomizers.toTypedArray())
         }
         return builder.toComparison()
     }
 
+    private fun keepIn(range: IntRange, value: Int): Int {
+        return Math.min(Math.max(value, range.first), range.last)
+    }
 }

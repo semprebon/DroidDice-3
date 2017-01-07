@@ -4,7 +4,7 @@ import junit.framework.Assert.assertEquals
 import org.junit.Test
 
 /**
- * Created by semprebon on 12/24/16.
+ * Test for Permutator
  */
 class PermutatorTest : TestSupport {
 
@@ -23,9 +23,7 @@ class PermutatorTest : TestSupport {
 
     @Test
     fun ReturnsAllPermutations() {
-        System.err.println("Starting test")
         val permutator = Permutator(listOf(1..3, listOf(5,10)))
-        System.err.println("permutator created")
         assertEquals(
             listOf(listOf(1,5), listOf(2,5), listOf(1,10), listOf(3,5), listOf(2,10), listOf(3,10)),
             permutator.map { it })

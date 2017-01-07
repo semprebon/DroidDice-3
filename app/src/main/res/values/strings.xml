@@ -1,8 +1,18 @@
 <resources>
     <string name="app_name">Droid Dice 3</string>
     <string name="action_settings">Settings</string>
-    <string name="edit_dice_spec_message">Enter Dice</string>
-    <string name="button_update">Update</string>
+
+    <!-- RollFragment -->
     <string name="zero_percent">0.00%</string>
     <string name="initial_roll">0</string>
+
+    <!-- EditDiceFragment -->
+    <string name="name_edit_label">Name</string>
+    <string name="dice_spec_label">Dice</string>
+    <string name="example_name">Sword Attack</string>
+    <string name="example_dice_spec">d8!+d6![k1]</string>
+    <string name="update_button">Update</string>
+    <string name="save_button">Save</string>
+    <string name="cancel_button">Cancel</string>
+
 </resources>

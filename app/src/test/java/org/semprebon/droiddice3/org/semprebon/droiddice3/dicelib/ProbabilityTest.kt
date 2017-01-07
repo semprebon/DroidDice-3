@@ -4,12 +4,12 @@ import org.junit.Test
 import org.junit.Assert.*
 
 /**
- * Created by Andrew on 11/24/2016.
+ * Test for Probability
  */
 class ProbabilityTest {
     companion object {
         fun assertNearlyEqual(expected: Double, actual: Double) {
-            assertTrue("${actual} should equal ${expected}", Math.abs(actual - expected) < 0.00001)
+            assertTrue("$actual should equal $expected", Math.abs(actual - expected) < 0.00001)
         }
     }
 
@@ -40,6 +40,8 @@ class ProbabilityTest {
     fun times() {
         assertNearlyEqual(0.09, p.times(2).value)
     }
+
+    @Test
     fun timesWithZero() {
         assertNearlyEqual(1.0, p.times(0).value)
     }

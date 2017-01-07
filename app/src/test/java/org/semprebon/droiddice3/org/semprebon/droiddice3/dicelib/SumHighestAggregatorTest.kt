@@ -4,7 +4,7 @@ import org.junit.Assert
 import org.junit.Test
 
 /**
- * Created by Andrew on 11/25/2016.
+ * Test for SumHighestAgregator
  */
 class SumHighestAggregatorTest {
 
@@ -47,7 +47,7 @@ class SumHighestAggregatorTest {
                 aggr.limitRanges(2..6, listOf(1..100, 2..3, 1..10)))
     }
     @Test
-    fun limitRangesReasonablyWhenNoPossbleLimit() {
+    fun limitRangesReasonablyWhenNoPossibleLimit() {
         Assert.assertNotNull(aggr.limitRanges(13..100, listOf(1..4,1..4,1..4)))
     }
 }

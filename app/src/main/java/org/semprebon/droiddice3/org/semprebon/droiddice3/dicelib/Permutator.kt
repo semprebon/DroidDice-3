@@ -1,13 +1,13 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
 /**
- * Given a set of ranges (or other iterables), it will genenerate permutations of those iterables,
+ * Given a set of ranges (or other iterables), it will generate permutations of those iterables,
  * starting with the lowest valued ones first. For example:
  *
- * Permutor(1..2,1..3) == ((1,1),(1,2),(2,1),(1,3),(2,3))
+ * Permutator(1..2,1..3) == ((1,1),(1,2),(2,1),(1,3),(2,3))
  *
  * This is designed to work even with unbounded iterators. Thus, you can pass in a filter.
- * Once this filter is met, the permutor stops
+ * Once this filter is met, the permutator stops
  */
 class Permutator(val ranges: List<Iterable<Int>>,
                  val startAt: List<Int> = ranges.map { if (it.iterator().hasNext()) it.first() else 0 },
@@ -18,7 +18,7 @@ class Permutator(val ranges: List<Iterable<Int>>,
         return EndConditionIterator(FilterIterator(PermutationIterator(), filter), endCondition)
     }
 
-    inner class PermutationIterator() : Iterator<List<Int>> {
+    inner class PermutationIterator : Iterator<List<Int>> {
         val values = ranges.map { AsNeededList(it.iterator()) }
         val queue: MutableList<List<Int>> = mutableListOf()
         val visited: MutableSet<List<Int>> = mutableSetOf()
@@ -47,7 +47,7 @@ class Permutator(val ranges: List<Iterable<Int>>,
         }
 
         private fun permutationsOf(currentIndexes: List<Int>): List<List<Int>> {
-            var permutations: MutableList<List<Int>> = mutableListOf()
+            val permutations: MutableList<List<Int>> = mutableListOf()
             currentIndexes.forEachIndexed { i, index ->
                 if (index > 0) permutations.add(decrementAt(i, currentIndexes))
                 if (values[i].containsIndex(index+1)) permutations.add(incrementAt(i, currentIndexes))

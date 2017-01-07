@@ -1,7 +1,7 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
 /**
- * Created by Andrew on 11/25/2016.
+ * SumAggregator simply adds up the individual rolls
  */
 class SumAggregator : Aggregator {
     override fun min(randomizers: List<Randomizer>): Int = aggregate(randomizers.map({ it.min }))
@@ -18,5 +18,9 @@ class SumAggregator : Aggregator {
             val min = Math.max(limit.first - maxOthers, range.first)
             min..max
         }
+    }
+
+    override fun expectedValue(randomizers: List<Randomizer>): Double {
+        return randomizers.map { it.expectedValue }.sum()
     }
 }

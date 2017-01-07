@@ -1,13 +1,14 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
-import org.junit.Assert
 import org.junit.Test
 import org.junit.Assert.*
+import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.TestSupport.Companion.ERR
 
 /**
- * Created by Andrew on 11/25/2016.
+ * Tests ExplodingDie
  */
 class ExplodingDieTest {
+
     fun assertProbabilityEqual(expected: Double, actual: Probability) {
         ProbabilityTest.assertNearlyEqual(expected, actual.value)
     }
@@ -32,7 +33,7 @@ class ExplodingDieTest {
     fun roll() {
         for (i in 1..10) {
             val r = die.roll()
-            assertTrue("${r} is equal or greater than 1", r.value >= 1)
+            assertTrue("$r is equal or greater than 1", r.value >= 1)
         }
     }
 
@@ -42,8 +43,8 @@ class ExplodingDieTest {
     }
 
     @Test
-    fun mostLikelyValueIsAverageRoundedUp() {
-        assertEquals(5, die.mostLikelyValue())
+    fun expectedValueIsCorrect() {
+        assertEquals(110.0/18.0, die.expectedValue, ERR)
     }
 
     @Test
@@ -62,8 +63,4 @@ class ExplodingDieTest {
         assertNotEquals(ExplodingDie(12), die.hashCode())
     }
 
-    @Test
-    fun hashCodeReturnsDifferentValuesWithDifferentClass() {
-        assertNotEquals(SimpleDie(10).hashCode(), die.hashCode())
-    }
 }

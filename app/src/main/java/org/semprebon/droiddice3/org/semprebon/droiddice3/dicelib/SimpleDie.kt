@@ -1,7 +1,5 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
-import android.util.Log
-import org.apache.commons.lang3.builder.CompareToBuilder
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
 
@@ -14,7 +12,7 @@ open class SimpleDie(val sides: Int) : Randomizer {
     open val size = (max - min) + 1
     val baseProbability = Probability(1.0/sides)
 
-    var value = min
+    override val expectedValue by lazy { (min + max) / 2.0 }
 
     override fun range(minProbability: Double): IntRange {
         if (baseProbability.value > minProbability) {

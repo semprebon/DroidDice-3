@@ -2,9 +2,10 @@ package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
 import org.junit.Test
 import org.junit.Assert.*
+import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.TestSupport.Companion.ERR
 
 /**
- * Created by Andrew on 11/25/2016.
+ * Test for SimpleDie
  */
 class SimpleDieTest {
     fun assertProbabilityEqual(expected: Double, actual: Probability) {
@@ -24,8 +25,22 @@ class SimpleDieTest {
     @Test
     fun probToBeat() {
         assertProbabilityEqual(4.0 / 6.0, d6.probToBeat(3))
-        assertProbabilityEqual(1.0, d6.probToBeat(0))
+        assertProbabilityEqual(1.0, d6.probToBeat(1))
         assertProbabilityEqual(0.0, d6.probToBeat(7))
+    }
+
+    @Test
+    fun probToRollOver() {
+        assertProbabilityEqual(3.0 / 6.0, d6.probToRollOver(3))
+        assertProbabilityEqual(1.0, d6.probToRollOver(0))
+        assertProbabilityEqual(0.0, d6.probToRollOver(7))
+    }
+
+    @Test
+    fun probToRollUnder() {
+        assertProbabilityEqual(2.0 / 6.0, d6.probToRollUnder(3))
+        assertProbabilityEqual(0.0, d6.probToRollUnder(1))
+        assertProbabilityEqual(1.0, d6.probToRollUnder(7))
     }
 
     @Test
@@ -35,13 +50,13 @@ class SimpleDieTest {
     fun roll() {
         for (i in 1..10) {
             val r = d6.roll().value
-            assertTrue("${r} is between 1 and 6", r in 1..6)
+            assertTrue("$r is between 1 and 6", r in 1..6)
         }
     }
 
     @Test
-    fun mostLikelyValueIsAverage() {
-        assertEquals(3, d6.mostLikelyValue())
+    fun expectedValueIsAverage() {
+        assertEquals(3.5, d6.expectedValue, ERR)
     }
 
     @Test

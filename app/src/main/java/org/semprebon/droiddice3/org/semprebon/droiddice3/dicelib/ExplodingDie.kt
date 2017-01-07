@@ -1,8 +1,5 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
-import android.util.Log
-import org.apache.commons.lang3.builder.HashCodeBuilder
-
 /**
  * Models an exploding die where, if the max value is rolled, the die is rolled
  * again and added
@@ -13,13 +10,13 @@ class ExplodingDie(sides: Int) : SimpleDie(sides) {
     override val min = 1
     override val max = max_rolls * sides
 
-    override fun mostLikelyValue() = (1+sides) / 2
+    override val expectedValue by lazy { ((sides + 1) * sides).toDouble() / (2.0 * (sides-1)) }
 
     override fun range(minProbability: Double): IntRange {
         var p = baseProbability.value
         var rangeMax = sides-1
         while (p * baseProbability.value > minProbability) {
-            p = p * baseProbability.value
+            p *= baseProbability.value
             rangeMax += sides
         }
         return min..rangeMax
@@ -45,9 +42,5 @@ class ExplodingDie(sides: Int) : SimpleDie(sides) {
     override fun probToBeat(target: Int): Probability {
         if (target <= size) return super.probToBeat(target)
         return baseProbability.and(probToBeat(target - size))
-    }
-
-    override fun hashCode() : Int {
-        return HashCodeBuilder(7, 11).append(size).toHashCode()
     }
 }

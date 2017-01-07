@@ -1,15 +1,10 @@
 package org.semprebon.droiddice3
 
-import android.content.Context
-import android.support.v4.view.GestureDetectorCompat
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
-import android.view.View
-import android.widget.TextView
 
 /**
- * Implements top to select/unselect, scrool to select multiple bars
+ * Implements top to select/unselect, scroll to select multiple bars
  */
 class ChartOnTouchListener(val context: RollActivity, val chartView: ChartView) :
         GestureDetector.SimpleOnGestureListener() {
@@ -24,7 +19,6 @@ class ChartOnTouchListener(val context: RollActivity, val chartView: ChartView) 
     }
 
     private var inScroll = false
-    private var selectedTo = false
 
     override fun onDown(event: MotionEvent): Boolean {
         inScroll = false
@@ -36,8 +30,6 @@ class ChartOnTouchListener(val context: RollActivity, val chartView: ChartView) 
         if (selectedBar != null) {
             val lowerSelected = chartView.getBar(selectedBar.index - 1)?.selected
             val higherSelected = chartView.getBar(selectedBar.index + 1)?.selected
-            val lowerCond = lowerSelected ?: higherSelected ?: false
-            val higherCond = higherSelected ?: lowerSelected ?: false
             val selection =
                     if (!selectedBar.selected) JUST_THIS
                     else if (lowerSelected != true && higherSelected == false) ALL_ABOVE

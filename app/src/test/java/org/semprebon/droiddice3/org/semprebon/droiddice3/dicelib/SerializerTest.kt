@@ -2,9 +2,6 @@ package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
 import org.junit.Test
 import org.junit.Assert.*
-import java.util.*
-import org.junit.Rule
-import org.junit.rules.ExpectedException
 
 
 

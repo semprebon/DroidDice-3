@@ -4,7 +4,7 @@ import junit.framework.Assert.assertEquals
 import org.junit.Test
 
 /**
- * Created by semprebon on 12/25/16.
+ * Test for AsNeededList
  */
 class AsNeededListTest {
 
@@ -13,13 +13,13 @@ class AsNeededListTest {
     @Test
     fun getsFirstElement() {
         val list = AsNeededList(baseList.iterator())
-        assertEquals(1, list.get(0))
+        assertEquals(1, list[0])
     }
 
     @Test
     fun getLaterElement() {
         val list = AsNeededList(baseList.iterator())
-        assertEquals(10, list.get(4))
+        assertEquals(10, list[4])
     }
 
     @Test

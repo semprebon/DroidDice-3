@@ -4,7 +4,7 @@ import junit.framework.Assert.*
 import org.junit.Test
 
 /**
- * Created by semprebon on 12/24/16.
+ * Test for ConditionalIterator
  */
 class ConditionalIteratorTest {
 

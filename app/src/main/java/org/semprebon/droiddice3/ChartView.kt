@@ -4,11 +4,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
-import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.Probability
 import java.util.*
 
 /**
@@ -23,7 +20,7 @@ class ChartView(context: Context, attributes: AttributeSet) : View(context, attr
 
     data class Bar(val index: Int, val value: Double, val selected: Boolean, val rolled: Boolean)
 
-    private var bars: List<Bar> = ArrayList<Bar>()
+    private var bars: List<Bar> = ArrayList()
     var maxValue = 0.0
     var minIndex = 0
     var maxIndex = 0

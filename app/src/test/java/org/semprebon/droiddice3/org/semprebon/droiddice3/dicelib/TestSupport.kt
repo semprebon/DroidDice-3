@@ -4,9 +4,13 @@ import org.junit.Assert
 import java.util.*
 
 /**
- * Created by Andrew on 11/26/2016.
+ * Common stuff for supporting tests
  */
 interface TestSupport {
+    companion object {
+        const val ERR = 0.0001
+    }
+
     fun canonize(list: Iterable<Iterable<Int>>): Map<List<Int>, Int> {
         return list.map { it.toList() }
                 .fold(HashMap<List<Int>, Int>(),
@@ -28,26 +32,24 @@ interface TestSupport {
     fun verifyMemoryUse(limit: Int, code: () -> Any): Any {
         val runtime = Runtime.getRuntime()
         runtime.gc()
-        val beforeMemmory = runtime.totalMemory() - runtime.freeMemory()
-        var result = code()
+        val beforeMemory = runtime.totalMemory() - runtime.freeMemory()
+        val result = code()
         runtime.gc()
-        val usedMemmory = (runtime.totalMemory() - runtime.freeMemory()) - beforeMemmory
-        Assert.assertTrue("Memory use of ${usedMemmory} exceeded limit of ${limit}", usedMemmory < limit)
+        val usedMemmory = (runtime.totalMemory() - runtime.freeMemory()) - beforeMemory
+        Assert.assertTrue("Memory use of $usedMemmory exceeded limit of $limit", usedMemmory < limit)
         return result
     }
 
     fun verifySpeed(secLimit: Double, code: () -> Any): Any {
         val limit = (secLimit * 10000*1000*1000).toInt()
         val reps = 1
-        var start: Long
-        var elapsed: Long
 
         var result = code()
-        start = System.nanoTime()
+        val start = System.nanoTime()
         (1..reps).forEach { result = code() }
 
-        elapsed = (System.nanoTime() - start) / reps
-        Assert.assertTrue("Used ${elapsed} nsecs; exceeded limit of ${limit}", elapsed < limit)
+        val elapsed = (System.nanoTime() - start) / reps
+        Assert.assertTrue("Used $elapsed nsecs; exceeded limit of $limit", elapsed < limit)
         return result
     }
 }
