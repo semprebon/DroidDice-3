@@ -6,10 +6,15 @@ import java.util.Random
 /**
  * A randomizer generates a random integer value.
  */
-interface Randomizer : Comparable<Randomizer> {
+interface Randomizer {
     companion object {
         val random = Random()
         const val MIN_PROBABILITY = 0.0000001 // 1 in a million
+
+        fun classNameSortValue(r: Randomizer): String {
+            return if (r is Adjustment) "Z" + r.javaClass.name else r.javaClass.name
+        }
+
     }
     val min: Int
     val max: Int
@@ -22,10 +27,5 @@ interface Randomizer : Comparable<Randomizer> {
     fun probToBeat(target: Int): Probability
     fun probToRollOver(target: Int) = probToBeat(target+1)
     fun probToRollUnder(target: Int) = probToBeat(target).not()
-
-    fun compareToBuilder(other: Randomizer): CompareToBuilder {
-        return CompareToBuilder().
-                append(this.javaClass.name, other.javaClass.name)
-    }
 }
 

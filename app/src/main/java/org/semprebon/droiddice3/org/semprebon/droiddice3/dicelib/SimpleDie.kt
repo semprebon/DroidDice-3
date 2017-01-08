@@ -46,10 +46,4 @@ open class SimpleDie(val sides: Int) : Randomizer {
     override fun hashCode() : Int {
         return HashCodeBuilder(3, 5).append(size).toHashCode()
     }
-
-    override fun compareTo(other: Randomizer): Int {
-        var builder = compareToBuilder(other)
-        if (other is SimpleDie) builder = builder.append(this.size, other.size)
-        return builder.toComparison()
-    }
 }

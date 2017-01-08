@@ -1,5 +1,7 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
+import java.util.regex.Pattern
+
 /**
  * Converts strings to and from DiceCombinations.
  *
@@ -26,14 +28,26 @@ class Serializer {
             } else {
                 SumAggregator()
             }
-        val diceStr = if (matcher != null) s.substring(0, matcher.range.first) else s
-        val randomizers = diceStr.split("+").flatMap({ deserializeTerm(it)})
+        val diceStr = (if (matcher != null) s.substring(0, matcher.range.first) else s).
+                replace("-", "+-")
+        val termRegex = Pattern.compile("(.+?)(?:\\+|-|\\+-)")
+        val termMatcher = termRegex.matcher(diceStr)
+        val randomizers: MutableList<Randomizer> = mutableListOf()
+        var endMatch = 0
+        while (termMatcher.lookingAt()) {
+            val operator = if (termMatcher.groupCount() == 2) termMatcher.group(2) else null
+            val term = (if (operator == "-1") "-" else "") + termMatcher.group(1)
+            randomizers.addAll(deserializeTerm(term))
+            endMatch = termMatcher.end()
+            termMatcher.region(endMatch, diceStr.length)
+        }
+        randomizers.addAll(deserializeTerm(diceStr.substring(endMatch)))
         return DiceCombination(randomizers, aggregator)
     }
 
     fun serialize(dice: DiceCombination): String {
         val randomizersString = dice.randomizers.
-                groupBy { serializeComponent(it) }.
+                groupBy { serializeRandomizer(it) }.
                 map({
                     val prefix = if (it.value.size == 1) "" else it.value.size.toString()
                     "$prefix${it.key}"
@@ -46,10 +60,11 @@ class Serializer {
         return randomizersString + suffix
     }
 
-    private fun serializeComponent(randomizer: Randomizer): String {
+    fun serializeRandomizer(randomizer: Randomizer): String {
         return when (randomizer) {
                 is ExplodingDie -> "d${randomizer.size}!"
                 is SimpleDie -> "d${randomizer.size}"
+                is Adjustment -> randomizer.value.toString()
                 else -> "?"
             }
     }
@@ -74,6 +89,10 @@ class Serializer {
         val matcher2 = Regex("d(\\d+)").matchEntire(s)
         if (matcher2 != null) return SimpleDie(matcher2.groupValues.component2().toInt())
 
+        val matcher3 = Regex("-?\\d+").matchEntire(s)
+        if (matcher3 != null) {
+            return Adjustment(s.toInt())
+        }
         throw ParseException("Unrecognized element: $s")
     }
 

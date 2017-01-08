@@ -89,17 +89,4 @@ class SimpleDieTest {
         assertEquals(SimpleDie(6).hashCode(), d6.hashCode())
         assertNotEquals(SimpleDie(8), d6.hashCode())
     }
-
-    @Test
-    fun compareToWithSameType() {
-        assertTrue(SimpleDie(6).compareTo(SimpleDie(8)) != 0)
-        assertTrue(SimpleDie(6).compareTo(SimpleDie(6)) == 0)
-        assertTrue(SimpleDie(6).compareTo(SimpleDie(4)) != SimpleDie(6).compareTo(SimpleDie(8)))
-    }
-
-    @Test
-    fun compareToWithDifferentTypes() {
-        assertTrue(SimpleDie(6).compareTo(ExplodingDie(6)) != 0)
-        assertTrue(ExplodingDie(6).compareTo(SimpleDie(6)) != SimpleDie(6).compareTo(ExplodingDie(6)))
-    }
 }

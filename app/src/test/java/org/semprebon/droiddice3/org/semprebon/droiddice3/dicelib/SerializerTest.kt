@@ -12,6 +12,8 @@ class SerializerTest : TestSupport {
 
     val d6 = SimpleDie(6)
     val dx8 = ExplodingDie(8)
+    val minus2 = Adjustment(-2)
+    val plus1 = Adjustment(1)
 
     @Test
     fun deserializeSimpleDie() {
@@ -25,7 +27,7 @@ class SerializerTest : TestSupport {
 
     @Test
     fun deserializeSeveralDifferentDice() {
-        assertEquals(DiceCombination(listOf(d6, dx8)), serializer.deserialize("d6+d8!"))
+        assertEquals(DiceCombination(listOf(dx8, d6, minus2)), serializer.deserialize("d8!+d6-2"))
     }
 
     @Test
@@ -45,7 +47,7 @@ class SerializerTest : TestSupport {
 
     @Test(expected=Serializer.ParseException::class)
     fun deserializeInvalidTerm() {
-        serializer.deserialize("6")
+        serializer.deserialize("d6++")
     }
 
     @Test
@@ -60,7 +62,7 @@ class SerializerTest : TestSupport {
 
     @Test
     fun serializeSeveralDifferentDice() {
-        assertEquals("d8!+d6", serializer.serialize(DiceCombination(listOf(dx8, d6))))
+        assertEquals("d6+d8!+-2", serializer.serialize(DiceCombination(listOf(dx8, d6, minus2))))
     }
 
     @Test
@@ -76,7 +78,7 @@ class SerializerTest : TestSupport {
 
     @Test
     fun serializeSumHighestWithDifferentDice() {
-        assertEquals("d8!+d6[k1]",
+        assertEquals("d6+d8![k1]",
                 serializer.serialize(DiceCombination(listOf(d6, dx8), SumHighestAggregator(1))))
     }
 }

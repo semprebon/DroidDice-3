@@ -1,7 +1,9 @@
 package org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib
 
+import org.apache.commons.lang3.builder.CompareToBuilder
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
+import java.util.*
 
 /**
  * Implements a randomizer consisting of a number of different dice, which can be aggregated by
@@ -12,9 +14,23 @@ class DiceCombination(initialRandomizers: List<Randomizer>,
 
     companion object {
         val LIKELY_PROBABILITY = Probability(1.0 / 1000.0)
+        val serializer = Serializer()
+
+        object randomizerComparator: Comparator<Randomizer> {
+            override fun compare(o1: Randomizer?, o2: Randomizer?): Int {
+                if (o1 == null || o2 == null)
+                    throw ClassCastException("Can't compare randomizer with null")
+                else {
+                    // reverse order by class name so adjustments end up last
+                    val builder = CompareToBuilder().append(o2.javaClass.name, o1.javaClass.name).
+                            append(serializer.serializeRandomizer(o1), serializer.serializeRandomizer(o2))
+                    return builder.toComparison()
+                }
+            }
+        }
     }
 
-    val randomizers = initialRandomizers.sorted()
+    val randomizers = initialRandomizers.sortedWith(randomizerComparator)
     override val min = aggregator.min(randomizers)
     override val max = aggregator.max(randomizers)
     override val expectedValue by lazy { aggregator.expectedValue(randomizers) }
@@ -98,15 +114,12 @@ class DiceCombination(initialRandomizers: List<Randomizer>,
         return HashCodeBuilder(13, 17).append(randomizers).toHashCode()
     }
 
-    override fun compareTo(other: Randomizer): Int {
-        val builder = compareToBuilder(other)
-        if (other is DiceCombination) {
-            builder.append(randomizers.toTypedArray(), other.randomizers.toTypedArray())
-        }
-        return builder.toComparison()
+    override fun toString(): String {
+        return serializer.serialize(this)
     }
 
     private fun keepIn(range: IntRange, value: Int): Int {
         return Math.min(Math.max(value, range.first), range.last)
     }
+
 }

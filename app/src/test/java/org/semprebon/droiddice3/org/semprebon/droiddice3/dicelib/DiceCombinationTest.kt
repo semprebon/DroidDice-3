@@ -17,10 +17,12 @@ class DiceCombinationTest : TestSupport {
     val d8 = SimpleDie(8)
     val dx6 = ExplodingDie(6)
     val d2 = SimpleDie(2)
+    val minus2 = Adjustment(-2)
 
     val singleDie = DiceCombination(listOf(d6), SumAggregator())
     val dice = DiceCombination(listOf(d6, d6), SumAggregator())
     val pick1Of2 = DiceCombination(listOf(d2, d2), SumHighestAggregator(1))
+    val adjustedDie = DiceCombination(listOf(minus2, d8), SumAggregator())
 
     @Test
     fun possibleRollsForSingleDie() {
@@ -65,7 +67,18 @@ class DiceCombinationTest : TestSupport {
             assertTrue("$r between 2 and 12", r.value in 2..12)
         }
     }
-    
+
+    @Test
+    fun randomizerSortsAdjustmentsToEnd() {
+        assertEquals(listOf(d8, minus2), DiceCombination(listOf(minus2, d8)).randomizers)
+    }
+
+    @Test
+    fun randomizerNormailizesDiceInDifferentOrder() {
+        assertEquals(DiceCombination(listOf(minus2, d8, dx6)).randomizers,
+                DiceCombination(listOf(dx6, d8, minus2)).randomizers)
+    }
+
     @Test
     fun probabilitiesWithValuesForSimpleDice() {
         val dice = DiceCombination(listOf(d2,d2))
@@ -102,16 +115,6 @@ class DiceCombinationTest : TestSupport {
         assertNull(result[5])
     }
 
-
-    @Test
-    fun compareToWithSameClass() {
-        assertTrue(DiceCombination(listOf(d6, d8)).compareTo(
-                DiceCombination(listOf(d6, d8))) == 0)
-        assertTrue(DiceCombination(listOf(d6, d8)).compareTo(
-                DiceCombination(listOf(d6, d6))) != 0)
-        assertTrue(DiceCombination(listOf(d6, d8)).compareTo(
-                DiceCombination(listOf(d6, d6), SumHighestAggregator(1))) != 0)
-    }
 
     @Test
     fun speedPerformanceOfProbabilitiesByValue() {
