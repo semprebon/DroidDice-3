@@ -26,36 +26,22 @@ class ChartOnTouchListener(val context: RollActivity, val chartView: ChartView) 
     }
 
     override fun onSingleTapUp(event: MotionEvent?): Boolean {
-        val selectedBar = barFromEvent(event)
-        if (selectedBar != null) {
-            val lowerSelected = chartView.getBar(selectedBar.index - 1)?.selected
-            val higherSelected = chartView.getBar(selectedBar.index + 1)?.selected
-            val selection =
-                    if (!selectedBar.selected) JUST_THIS
-                    else if (lowerSelected != true && higherSelected == false) ALL_ABOVE
-                    else if (higherSelected != false && lowerSelected == false) ALL_BELOW
-                    else NONE_SELECTED
-
-            (chartView.minIndex..chartView.maxIndex).forEach {
-                val bar = chartView.getBar(it)
-                val desiredSelected = selection(selectedBar.index, it)
-                if (bar != null && desiredSelected != bar.selected) {
-                    val newBar = bar.copy(selected = desiredSelected)
-                    chartView.setBar(newBar.index, newBar)
-                }
-            }
+        val index = indexFromEvent(event)
+        if (index != null) {
+            chartView.incrementProbabilityType()
+            chartView.probabilityIndex = index
             chartView.invalidate()
             context.updateProbability()
+            context.updateResultView()
             return true
         }
         return super.onSingleTapUp(event)
     }
 
-    private fun barFromEvent(event: MotionEvent?) : ChartView.Bar? {
+    private fun indexFromEvent(event: MotionEvent?) : Int? {
         val x = event?.x
         if (x != null) {
-            val roll: Int = chartView.xToIndex(x)
-            return chartView.getBar(roll)
+            return chartView.xToIndex(x)
         } else {
             return null
         }

@@ -9,6 +9,7 @@ import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.Serializer
 import android.view.*
 import android.view.MotionEvent
 import android.widget.*
+import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.Probability
 import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.RollResult
 import java.io.*
 
@@ -16,10 +17,12 @@ import java.io.*
 /**
  * Main activity of app - lets user roll dice
  *
- * FIXME: recompute display range when dice change
- * FIXME: Update probability of hitting selection when dice are updated
- * TODO: Keep probability selection between rolls (add to saved dice?)
- * TODO: Report Success/Failure based on roll falling in selected range
+ * FIXME: Update probability of hitting selection when dice are updated (or clear)
+ * FIXME: Selection of bars is a little off
+ * FIXME: Clear keyboard when exiting dice edit
+ * TODO: Save selection with dice
+ * TODO: On edit, default to current dice
+ * TODO: Percent and result roll should be same color(s) as respective bars
  * TODO: Implement level of success mechanics
  * TODO: zoom and pan
  * TODO: Keyboard/buttons for entering dice
@@ -66,6 +69,7 @@ class RollActivity : AppCompatActivity() {
 
     fun updateDice(dice: DiceCombination) {
         this.dice = dice
+        displayedRange = dice.range(0.01)
         updateResult()
     }
 
@@ -73,10 +77,10 @@ class RollActivity : AppCompatActivity() {
         val probabilitiesByValue =
                 dice.probabilitiesByValue(displayedRange,
                         endCondition = dice.totalProbabilityOf(0.95))
-        val bars = probabilitiesByValue.
-                        map { ChartView.Bar(it.key, it.value, false, roll.value == it.key)}
+        val bars = probabilitiesByValue.map { ChartView.Bar(it.key, it.value) }
         val chartView = findViewById(R.id.chart_view) as ChartView
         chartView.setBars(bars)
+        chartView.rollIndex = roll.value
         chartView.invalidate()
     }
 
@@ -123,9 +127,18 @@ class RollActivity : AppCompatActivity() {
     fun updateProbability() {
         val resultText = findViewById(R.id.probability_text) as TextView
         val chartView = findViewById(R.id.chart_view) as ChartView
-        val probability =
-                chartView.getBars().filter { it.selected }.map { it.value }.fold(0.0, { a,b -> a+b })
-        resultText.text = "${String.format("%.2f", probability*100.0)}%"
+        val limit = chartView.probabilityIndex
+        val probability = when (chartView.probabilityType) {
+            ChartView.ProbabilityType.NONE -> Probability.NEVER
+            ChartView.ProbabilityType.EXACT -> dice.probToRoll(limit)
+            ChartView.ProbabilityType.HIGH -> dice.probToBeat(limit)
+            ChartView.ProbabilityType.LOW -> dice.probToRollOver(limit).not()
+        }
+        val rollSelected = chartView.rollIndex == chartView.probabilityIndex
+        resultText.text = "${String.format("%.2f", probability.value*100.0)}%"
+        resultText.setTextColor(
+                if (rollSelected) chartView.selectedRolledBarColor
+                else chartView.selectedBarColor)
     }
 
     /**
@@ -159,9 +172,21 @@ class RollActivity : AppCompatActivity() {
      */
     private fun updateResult() {
         val roll = dice.roll()
-        val resultText = findViewById(R.id.result_text) as TextView
-        resultText.text = roll.value.toString()
         updateChart(roll)
+        updateResultView()
+    }
+
+    fun updateResultView() {
+        val resultText = findViewById(R.id.result_text) as TextView
+        val chartView = findViewById(R.id.chart_view) as ChartView
+        val roll = chartView.rollIndex
+
+        if (roll != null) {
+            resultText.text = chartView.rollIndex.toString()
+            resultText.setTextColor(
+                    if (chartView.isSelected(roll)) chartView.selectedRolledBarColor
+                    else chartView.rolledBarColor)
+        }
     }
 
     private fun <K, V>copyAsMutable(map: Map<K, V>) = mutableMapOf(*map.map { it.toPair() }.toTypedArray())

@@ -11,8 +11,6 @@ import android.view.View
 import org.semprebon.droiddice3.R.attr.theme
 import java.util.*
 import android.util.TypedValue
-import android.graphics.Shader
-import android.graphics.LinearGradient
 
 
 
@@ -31,7 +29,36 @@ class ChartView(context: Context, attributes: AttributeSet) : View(context, attr
 
     var outlineWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3.0f, resources.displayMetrics)
 
-    data class Bar(val index: Int, val value: Double, val selected: Boolean, val rolled: Boolean)
+    var probabilityIndex: Int = Int.MIN_VALUE
+    var rollIndex: Int? = null
+
+    enum class ProbabilityType { NONE, EXACT, HIGH, LOW }
+    var probabilityType = ProbabilityType.EXACT
+
+    fun incrementProbabilityType() {
+        probabilityType = when (probabilityType) {
+            ProbabilityType.NONE -> ProbabilityType.EXACT
+            ProbabilityType.EXACT -> ProbabilityType.HIGH
+            ProbabilityType.HIGH -> ProbabilityType.LOW
+            ProbabilityType.LOW -> ProbabilityType.NONE
+        }
+    }
+
+    data class Bar(val index: Int, val value: Double)
+
+    fun isSelected(index: Int): Boolean {
+        val limit = probabilityIndex
+        return when (probabilityType) {
+            ProbabilityType.NONE -> false
+            ProbabilityType.EXACT -> index == probabilityIndex
+            ProbabilityType.HIGH -> if (limit != null) index >= limit else false
+            ProbabilityType.LOW -> if (limit != null) index <= limit else false
+        }
+    }
+
+    fun isRolled(index: Int): Boolean {
+        return index == rollIndex
+    }
 
     private var bars: List<Bar> = ArrayList()
     var maxValue = 0.0
@@ -58,7 +85,6 @@ class ChartView(context: Context, attributes: AttributeSet) : View(context, attr
         bars = bars.minus(bars[i]).plus(bar)
     }
 
-
     override fun onDraw(canvas: Canvas) {
         if (bars.count() == 0) return
         val blackPaint = paintForColor(Color.BLACK)
@@ -79,7 +105,7 @@ class ChartView(context: Context, attributes: AttributeSet) : View(context, attr
             val y0 = valueToY(0.0)
             val y1 = valueToY((bar.value))
 
-            canvas.drawRect(x0, y0, x1, y1, fillPaints[Pair(bar.selected, bar.rolled)])
+            canvas.drawRect(x0, y0, x1, y1, fillPaints[Pair(isSelected(bar.index), isRolled(bar.index))])
             canvas.drawText(bar.index.toString(), (x0 + x1) / 2, y0 - 5, blackPaint)
         }
     }
