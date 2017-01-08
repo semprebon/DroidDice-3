@@ -16,16 +16,13 @@ import java.io.*
 /**
  * Main activity of app - lets user roll dice
  *
- * TODO: recompute display range when dice change
- * TODO: Use dx-y in dice specs instead of dx+-y
+ * FIXME: recompute display range when dice change
+ * FIXME: Update probability of hitting selection when dice are updated
  * TODO: Keep probability selection between rolls (add to saved dice?)
- * TODO: Update probability of hitting selection when dice are updated
  * TODO: Report Success/Failure based on roll falling in selected range
  * TODO: Implement level of success mechanics
  * TODO: zoom and pan
  * TODO: Keyboard/buttons for entering dice
- * TODO: Color scheme!
- * TODO: optimize probability computation
  */
 class RollActivity : AppCompatActivity() {
 

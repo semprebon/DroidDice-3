@@ -16,6 +16,8 @@ import java.util.regex.Pattern
  * * * 3d6>5 - count rolls > 5
  * * * 3d6K2 or 3d6H2 - roll 3 d6 and sum  highest 2
  * * * 3d6L2 - roll 3 d6 and sum lowest 2
+ *
+ *  TODO: Use dx-y in dice specs instead of dx+-y
  */
 class Serializer {
 

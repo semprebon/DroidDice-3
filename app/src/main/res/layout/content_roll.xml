@@ -126,7 +126,8 @@
         <org.semprebon.droiddice3.ChartView
             android:id="@+id/chart_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            barColor="@color/barColor"/>
     </FrameLayout>
 
 </RelativeLayout>

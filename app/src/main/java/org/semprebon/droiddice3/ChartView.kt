@@ -4,19 +4,32 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.support.v4.content.res.ResourcesCompat
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
+import org.semprebon.droiddice3.R.attr.theme
 import java.util.*
+import android.util.TypedValue
+import android.graphics.Shader
+import android.graphics.LinearGradient
+
+
+
+
 
 /**
  * Displays bar chart of probabilities.
  */
 class ChartView(context: Context, attributes: AttributeSet) : View(context, attributes) {
     private val TAG = "ChartView"
-    var barColor = Color.argb(0xff, 0xff, 0xec, 0xb3)
-    var selectedBarColor = Color.argb(0xff, 0xff, 0xc1, 0xb3)
-    var rolledBarColor = Color.argb(0xff, 0xff, 0x52, 0x52)
-    var selectedRolledBarColor = Color.argb(0xff, 0xd3, 0x2f, 0x2f)
+
+    val barColor = ResourcesCompat.getColor(resources, R.color.barColor, null)
+    val selectedBarColor = ResourcesCompat.getColor(resources, R.color.selectedBarColor, null)
+    val rolledBarColor = ResourcesCompat.getColor(resources, R.color.rolledBarColor, null)
+    val selectedRolledBarColor = ResourcesCompat.getColor(resources, R.color.selectedRolledBarColor, null)
+
+    var outlineWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3.0f, resources.displayMetrics)
 
     data class Bar(val index: Int, val value: Double, val selected: Boolean, val rolled: Boolean)
 
@@ -53,27 +66,31 @@ class ChartView(context: Context, attributes: AttributeSet) : View(context, attr
         blackPaint.textSize = barWidth*0.75f
         blackPaint.textAlign = Paint.Align.CENTER
 
-        val paints =
-                arrayOf(barColor, selectedBarColor, rolledBarColor, selectedRolledBarColor).
-                        map { paintForColor(it) }
+        Log.d(TAG, "Standard bar color is ${Integer.toHexString(R.color.barColor)}")
+        val fillPaints: Map<Pair<Boolean, Boolean>, Paint> =
+                mapOf(Pair(Pair(false, false), paintForColor(barColor)),
+                      Pair(Pair(false, true ), paintForColor(rolledBarColor)),
+                      Pair(Pair(true,  false), paintForColor(selectedBarColor)),
+                      Pair(Pair(true,  true ),  paintForColor(selectedRolledBarColor)))
+
         bars.forEachIndexed { i, bar ->
             val x0 = indexToX(bar.index)
             val x1 = indexToX(bar.index + 1) - BAR_GAP
             val y0 = valueToY(0.0)
             val y1 = valueToY((bar.value))
-            canvas.drawRect(x0, y0, x1, y1, paints[colorIndexForBar(bar)])
+
+            canvas.drawRect(x0, y0, x1, y1, fillPaints[Pair(bar.selected, bar.rolled)])
             canvas.drawText(bar.index.toString(), (x0 + x1) / 2, y0 - 5, blackPaint)
         }
     }
 
-    private fun paintForColor(color: Int): Paint {
+    private fun paintForColor(color: Int, style: Paint.Style = Paint.Style.FILL): Paint {
         val p = Paint()
         p.color = color
+        p.style = style
+        p.strokeWidth = outlineWidth
         return p
     }
-
-    private fun colorIndexForBar(bar: Bar) =
-            (if (bar.selected) 1 else 0) + (if (bar.rolled) 2 else 0)
 
     private fun indexToX(index: Int) = ((index - minIndex) * width).toFloat() / (maxIndex + 1 - minIndex)
     private fun valueToY(value: Double) = height - ((value * height) / maxValue).toFloat()

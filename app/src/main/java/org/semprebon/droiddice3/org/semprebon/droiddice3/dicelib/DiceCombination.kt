@@ -8,6 +8,8 @@ import java.util.*
 /**
  * Implements a randomizer consisting of a number of different dice, which can be aggregated by
  * an aggregator object to determine the final value
+ *
+ *  TODO: optimize probability computation
  */
 class DiceCombination(initialRandomizers: List<Randomizer>,
                       val aggregator: Aggregator = SumAggregator()) : Randomizer {

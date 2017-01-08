@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FFC107</color>
-    <color name="colorPrimaryLight">#FFECB3</color>
-    <color name="colorPrimaryDark">#FFA000</color>
-    <color name="colorAccent">#FF5252</color>
+    <color  name="colorPrimary">#FFFFC107</color>
+    <color name="colorPrimaryLight">#FFFFECB3</color>
+    <color name="colorPrimaryDark">#FFFFA000</color>
+    <color name="colorAccent">#FF009688</color>
+    <color name="colorAccentDark">#FF00796B</color>
+    <color name="colorAccentLight">#FF4DB6AC</color>
 
-    <color name="barColor">#ffecb3</color>
-    <color name="selectedBarColor">#ffc1b3</color>
-    <color name="rolledBarColor">#ff5252</color>
-    <color name="selectedRolledBarColor">#d32f2f</color>
+    <color name="barColor">@color/colorPrimary</color>
+    <color name="selectedBarColor">@color/colorAccentLight</color>
+    <color name="rolledBarColor">@color/colorPrimaryDark</color>
+    <color name="selectedRolledBarColor">@color/colorAccent</color>
 
-    <color name="colorWild">#0000FF</color>
 </resources>
