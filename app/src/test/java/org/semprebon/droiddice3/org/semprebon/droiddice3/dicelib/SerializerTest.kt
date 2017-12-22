@@ -45,6 +45,11 @@ class SerializerTest : TestSupport {
         serializer.deserialize("du")
     }
 
+    @Test
+    fun deserializeSumLowest() { assertEquals(DiceCombination(listOf(d6, d6, d6, d6), SumLowestAggregator(3)),
+            serializer.deserialize("4d6[L3]"))
+    }
+
     @Test(expected=Serializer.ParseException::class)
     fun deserializeInvalidTerm() {
         serializer.deserialize("d6++")
@@ -80,5 +85,11 @@ class SerializerTest : TestSupport {
     fun serializeSumHighestWithDifferentDice() {
         assertEquals("d6+d8![k1]",
                 serializer.serialize(DiceCombination(listOf(d6, dx8), SumHighestAggregator(1))))
+    }
+
+    @Test
+    fun serializeSumLowestWithDifferentDice() {
+        assertEquals("d6+d8![L1]",
+                serializer.serialize(DiceCombination(listOf(d6, dx8), SumLowestAggregator(1))))
     }
 }

@@ -46,4 +46,8 @@ open class SimpleDie(val sides: Int) : Randomizer {
     override fun hashCode() : Int {
         return HashCodeBuilder(3, 5).append(size).toHashCode()
     }
+
+    override fun toString(): String {
+        return "d${sides}"
+    }
 }

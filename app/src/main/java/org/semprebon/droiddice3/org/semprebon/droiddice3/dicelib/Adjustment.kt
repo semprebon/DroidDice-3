@@ -26,4 +26,7 @@ class Adjustment(val value: Int): Randomizer  {
         return EqualsBuilder().append(value, other.value).isEquals()
     }
 
+    override fun toString(): String {
+        return "+${value}"
+    }
 }

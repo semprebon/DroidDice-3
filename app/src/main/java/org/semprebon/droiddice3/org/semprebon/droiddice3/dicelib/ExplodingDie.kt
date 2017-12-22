@@ -43,4 +43,8 @@ class ExplodingDie(sides: Int) : SimpleDie(sides) {
         if (target <= size) return super.probToBeat(target)
         return baseProbability.and(probToBeat(target - size))
     }
+
+    override fun toString(): String {
+        return "d${sides}!"
+    }
 }

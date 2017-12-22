@@ -115,7 +115,30 @@ class DiceCombinationTest : TestSupport {
         assertNull(result[5])
     }
 
+    @Test
+    fun expectedValueReturnsResultFromAggregator() {
+        assertEquals(2*d6.expectedValue, dice.expectedValue, 0.5)
+        assertEquals(7.0/4.0, pick1Of2.expectedValue, 0.5)
+    }
 
+    @Test
+    fun probabilitiesForSumHighest() {
+        val dice = DiceCombination(listOf(d2,d2), SumHighestAggregator(1))
+        val probabilities = dice.probabilitiesByValue(1..2)
+        System.out.println("Probabilites by value are ${probabilities}")
+        assertEquals(0.25, probabilities[1])
+        assertEquals(0.75, probabilities[2])
+    }
+
+    @Test
+    fun probabilitiesForSumLowest() {
+        val dice = DiceCombination(listOf(d2,d2), SumLowestAggregator(1))
+        val probabilities = dice.probabilitiesByValue(1..2)
+        assertEquals(0.75, probabilities[1])
+        assertEquals(0.25, probabilities[2])
+    }
+
+    // Performance tests
     @Test
     fun speedPerformanceOfProbabilitiesByValue() {
         var values: Map<Int, Double>? = null
@@ -160,12 +183,7 @@ class DiceCombinationTest : TestSupport {
         }) as IntRange
     }
 
-    @Test
-    fun expectedValueReturnsResultFromAggregator() {
-        assertEquals(2*d6.expectedValue, dice.expectedValue, 0.5)
-        assertEquals(7.0/4.0, pick1Of2.expectedValue, 0.5)
-    }
-
+    // Equality tests
     @Test
     fun equalWithEqualValues() {
         assertEquals(DiceCombination(listOf(d6, d6a), SumAggregator()), dice)

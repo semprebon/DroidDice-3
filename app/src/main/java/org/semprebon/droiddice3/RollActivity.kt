@@ -1,13 +1,19 @@
 package org.semprebon.droiddice3
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.view.GestureDetectorCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.DiceCombination
 import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.Serializer
 import android.view.*
 import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.Probability
 import org.semprebon.droiddice3.org.semprebon.droiddice3.dicelib.RollResult
@@ -20,9 +26,10 @@ import java.io.*
  * FIXME: Update probability of hitting selection when dice are updated (or clear)
  * FIXME: Selection of bars is a little off
  * FIXME: Clear keyboard when exiting dice edit
+ * FIXME: Fails on 7d8
+ * TODO: Auto set name to roll if not specified
+ * TODO: Disable dice selector and edit button when edit view opened
  * TODO: Save selection with dice
- * TODO: On edit, default to current dice
- * TODO: Percent and result roll should be same color(s) as respective bars
  * TODO: Implement level of success mechanics
  * TODO: zoom and pan
  * TODO: Keyboard/buttons for entering dice
@@ -39,6 +46,7 @@ class RollActivity : AppCompatActivity() {
     var detector: GestureDetectorCompat? = null
     var displayedRange: IntRange = dice.range(0.01)
     var adapter : ArrayAdapter<String>? = null
+    var animator: Animator? = null
 
     companion object { private val TAG = "RollActivity" }
 
@@ -95,8 +103,10 @@ class RollActivity : AppCompatActivity() {
      * Triggered when user clicks button to edit dice
      */
     fun editDiceSpec(view: View) {
-        val editView = findViewById(R.id.edit_dice)
-        editView.visibility = View.VISIBLE
+        val spinner = findViewById(R.id.dice_spec) as Spinner
+        (findViewById(R.id.name_edit) as TextView).text = (spinner.selectedView as TextView).text
+        (findViewById(R.id.dice_spec_edit) as TextView).text = serializer.serialize(dice)
+        findViewById(R.id.edit_dice).visibility = View.VISIBLE
         findViewById(R.id.rollView).invalidate()
     }
 
@@ -104,11 +114,14 @@ class RollActivity : AppCompatActivity() {
      * Triggered when user clicks to save edited dice
      */
     fun saveDiceSpec(view: View) {
+
         val name = (findViewById(R.id.name_edit) as EditText).text.toString()
         val diceSpec = (findViewById(R.id.dice_spec_edit) as EditText).text.toString()
 
-        diceSets.put(name, serializer.deserialize(diceSpec))
+        dice = serializer.deserialize(diceSpec)
+        diceSets.put(name, dice)
         updateDiceSets()
+        setDiceSelection(name)
         closeDiceSpecEdit(view)
     }
 
@@ -118,7 +131,10 @@ class RollActivity : AppCompatActivity() {
     fun closeDiceSpecEdit(view: View) {
         findViewById(R.id.edit_dice).visibility = View.GONE
         findViewById(R.id.rollView).invalidate()
+        hideKeyboard(findViewById(R.id.name_edit))
+        hideKeyboard(findViewById(R.id.dice_spec_edit))
         findViewById(R.id.dice_spec).requestFocus()
+        Log.d(TAG, "Current focus is $currentFocus")
     }
 
     /**
@@ -166,6 +182,15 @@ class RollActivity : AppCompatActivity() {
         }
     }
 
+    private fun hideKeyboard(view: View?) {
+        if (view != null) {
+            view.clearFocus()
+            val inputMethodManager = (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0)
+            //inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY)
+        }
+    }
+
     /**
      * Updates the chart and result text and any related views that are dependent
      * on the dice roll
@@ -174,6 +199,10 @@ class RollActivity : AppCompatActivity() {
         val roll = dice.roll()
         updateChart(roll)
         updateResultView()
+        val animator = AnimatorInflater.loadAnimator(this, R.animator.highlight_roll)
+        animator!!.setTarget(findViewById(R.id.result_text))
+        Log.d(TAG, "Starting animation")
+        animator?.start()
     }
 
     fun updateResultView() {
@@ -190,6 +219,10 @@ class RollActivity : AppCompatActivity() {
     }
 
     private fun <K, V>copyAsMutable(map: Map<K, V>) = mutableMapOf(*map.map { it.toPair() }.toTypedArray())
+
+    private fun setDiceSelection(name: String) {
+        (findViewById(R.id.dice_spec) as Spinner).setSelection(diceSets.keys.indexOf(name))
+    }
 
     /**
      * Update the dice set selection from storage

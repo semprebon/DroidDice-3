@@ -22,11 +22,16 @@ import java.util.regex.Pattern
 class Serializer {
 
     fun deserialize(s: String): DiceCombination {
-        val matcher = Regex("\\[k(\\d+)\\]?\\Z").find(s)
+        val matcher = Regex("\\[([kL])(\\d+)\\]?\\Z").find(s)
         val aggregator =
             if (matcher != null) {
-                val keepStr = matcher.groupValues.component2()
-                SumHighestAggregator(keepStr.toInt())
+                val aggregatorTerm = matcher.groupValues.component2()
+                val keepStr = matcher.groupValues.component3()
+                when (aggregatorTerm[0]) {
+                    'k' -> SumHighestAggregator(keepStr.toInt())
+                    'L' -> SumLowestAggregator(keepStr.toInt())
+                    else -> throw RuntimeException("Aggregator clause must start with k or L, not ${aggregatorTerm[0]}")
+                }
             } else {
                 SumAggregator()
             }
@@ -57,6 +62,7 @@ class Serializer {
         val suffix = when (dice.aggregator) {
                 is SumAggregator -> ""
                 is SumHighestAggregator -> "[k${dice.aggregator.n}]"
+                is SumLowestAggregator -> "[L${dice.aggregator.n}]"
                 else -> throw Exception("Unknown aggregator")
             }
         return randomizersString + suffix

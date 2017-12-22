@@ -68,7 +68,8 @@ class DiceCombination(initialRandomizers: List<Randomizer>,
     fun possibleRolls(range: IntRange = defaultRange(),
                       filter: (List<Int>) -> Boolean = { true },
                       endCondition: (List<Int>) -> Boolean = { false }): Iterable<List<Int>> {
-        val ranges = aggregator.limitRanges(range, randomizers.map { it.range() })
+        //val ranges = aggregator.limitRanges(range, randomizers.map { it.range() })
+        val ranges = randomizers.map { it.range() }
         val permutations = Permutator(ranges, filter = filter, endCondition = endCondition,
                 startAt = randomizers.mapIndexed { i, r -> keepIn(ranges[i], r.expectedValue.toInt()) })
         return permutations.filter { values: List<Int>  -> range.contains(aggregate(values)) }
@@ -123,5 +124,4 @@ class DiceCombination(initialRandomizers: List<Randomizer>,
     private fun keepIn(range: IntRange, value: Int): Int {
         return Math.min(Math.max(value, range.first), range.last)
     }
-
 }

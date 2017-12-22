@@ -92,7 +92,6 @@ class ChartView(context: Context, attributes: AttributeSet) : View(context, attr
         blackPaint.textSize = barWidth*0.75f
         blackPaint.textAlign = Paint.Align.CENTER
 
-        Log.d(TAG, "Standard bar color is ${Integer.toHexString(R.color.barColor)}")
         val fillPaints: Map<Pair<Boolean, Boolean>, Paint> =
                 mapOf(Pair(Pair(false, false), paintForColor(barColor)),
                       Pair(Pair(false, true ), paintForColor(rolledBarColor)),
